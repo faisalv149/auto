@@ -1,0 +1,7 @@
+# not needed on the live site
+tools/
+data/
+README.md
+.gitignore
+.env*
+.vercel/

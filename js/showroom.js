@@ -145,17 +145,19 @@
       </div>
     </div>`;
   }
-  function captionOf(c, i) {
+  // name, body · stock, price & mileage: used above the car in the carousel and in the popup
+  function captionInner(c) {
     return `
-      <div class="rw__cap${i === 0 ? ' is-on' : ''}" data-rw-cap="${i}">
         <span class="rw__cap-type">${esc(c.body)} · Stock #${esc(c.stock)}</span>
         <span class="rw__cap-name">${esc(c.name)}</span>
         <span class="rw__cap-stats">
           <span class="rw__cap-stat"><small>Price</small><strong>${money(c.price)}</strong></span>
           <span class="rw__cap-sep" aria-hidden="true"></span>
           <span class="rw__cap-stat"><small>Mileage</small><strong>${miles(c.mileage)}</strong></span>
-        </span>
-      </div>`;
+        </span>`;
+  }
+  function captionOf(c, i) {
+    return `<div class="rw__cap${i === 0 ? ' is-on' : ''}" data-rw-cap="${i}">${captionInner(c)}</div>`;
   }
   function buildMarkup(cars) {
     const bodies = cars.map((c, i) => `
@@ -212,6 +214,7 @@
             <div class="rw__lb-stage" data-rw-lb-stage></div>
             <div class="rw__lb-photo" data-rw-lb-photo aria-live="polite"><img alt="" decoding="async"></div>
             <div class="rw__lb-thumbs" data-rw-lb-thumbs role="tablist" aria-label="Photos"></div>
+            <div class="rw__lb-info" data-rw-lb-info></div>
             <div class="rw__lb-top">
               <p class="rw__lb-cap"><span class="rw__lb-kicker" data-rw-lb-kicker></span><span class="rw__lb-name" data-rw-lb-name></span></p>
               <button class="rw__lb-close" type="button" data-rw-zoom-close aria-label="Close">${I_X}</button>
@@ -318,6 +321,7 @@
       this.lbStage = q('[data-rw-lb-stage]');
       this.lbPhoto = q('[data-rw-lb-photo]');
       this.lbThumbs = q('[data-rw-lb-thumbs]');
+      this.lbInfo = q('[data-rw-lb-info]');
       this.cursor = q('[data-rw-cursor]');
       this.panel = q('.rw__panel');
       this.caps = $$('[data-rw-cap]', this);
@@ -505,14 +509,10 @@
         path += `M0 ${f(y)}H${f(W)}`;
         prevY = y;
       }
-      // lines running into the distance, converging on the vanishing point
+      // lines running into the distance, converging on the vanishing point. They live in
+      // their own <path> and slide sideways with the carousel (see renderFloorRays).
       const reach = Math.max(hx, W - hx) / (d * Math.max(1, H - yh));
-      const M = Math.ceil(reach) + 2;
-      const y0 = yh + 2;
-      for (let m = -M; m <= M; m++) {
-        const k = m * d;
-        path += `M${f(hx + k * (y0 - yh))} ${f(y0)}L${f(hx + k * (H - yh))} ${f(H)}`;
-      }
+      this.floor = { hx, yh, H, d, M: Math.ceil(reach) + 3, y0: yh + 2, s: null };
       const fadeTop = yh + span * 0.5;
       svg.setAttribute('viewBox', `0 0 ${f(W)} ${f(H)}`);
       svg.innerHTML = `
@@ -535,7 +535,29 @@
         </defs>
         <g mask="url(#rwFloorMask)">
           <path d="${path}" fill="none" stroke="url(#rwFloorFade)" stroke-width="1" vector-effect="non-scaling-stroke" shape-rendering="geometricPrecision"/>
+          <path data-rw-floor-rays fill="none" stroke="url(#rwFloorFade)" stroke-width="1" vector-effect="non-scaling-stroke" shape-rendering="geometricPrecision"/>
         </g>`;
+      this.floorRays = svg.querySelector('[data-rw-floor-rays]');
+      this.renderFloorRays();
+    }
+    // The floor drifts the opposite way to the cars: cars move right→left (next car),
+    // the grid slides left→right, and vice versa. Half a floor tile per car, following
+    // the same continuous position as the cars, so it tracks the drag and the spring.
+    renderFloorRays() {
+      const F = this.floor, el = this.floorRays;
+      if (!F || !el) return;
+      const SHIFT = 0.5;                                          // floor tiles per car
+      const s = ((((this.cur * SHIFT) % 1) + 1) % 1) * F.d;       // ground offset, wraps every tile
+      const key = s.toFixed(4);
+      if (key === F.s) return;
+      F.s = key;
+      const f = (n) => n.toFixed(1);
+      let p = '';
+      for (let m = -F.M; m <= F.M; m++) {
+        const k = m * F.d + s;
+        p += `M${f(F.hx + k * (F.y0 - F.yh))} ${f(F.y0)}L${f(F.hx + k * (F.H - F.yh))} ${f(F.H)}`;
+      }
+      el.setAttribute('d', p);
     }
 
     /* ----- placement ----- */
@@ -600,6 +622,7 @@
     renderAll() {
       if (!this.bodies) return;
       this.renderCaptions();
+      this.renderFloorRays();
       const { W, fs, hx, hy, modelH } = this;
       if (this.mode === 'ring') {
         // Focus layout: slot 0 = centre, slot ±1 = centred on the stage edge
@@ -810,6 +833,10 @@
       const foot = hero.style.getPropertyValue('--rw-foot'); if (foot) wrap.style.setProperty('--rw-foot', foot);
       clearTimeout(this.lbT);
       this.lbStage.replaceChildren(wrap);
+      // car name / price above the car (same caption as the carousel); the car fills the space below it
+      this.lbInfo.innerHTML = captionInner(this.cars[this.index]);
+      const lbTop = this.lb.getBoundingClientRect().top;
+      this.lb.style.setProperty('--rw-lb-top', Math.round(this.lbInfo.getBoundingClientRect().bottom - lbTop + 28) + 'px');
       const sr = this.lbStage.getBoundingClientRect();
       const ar = arOf(this.cars[this.index]);
       const h = Math.max(120, Math.min(sr.height, sr.width / ar));
@@ -887,6 +914,7 @@
       }
       const hadFocus = this.lb.contains(document.activeElement);
       this.classList.remove('rw--zoom');
+      this.lb.classList.remove('is-photo');   // don't leave a gallery photo on top of the carousel
       this.lb.setAttribute('aria-hidden', 'true');
       this.clearHot();
       this.lbT = setTimeout(() => this.lbStage.replaceChildren(), 950);
@@ -971,7 +999,11 @@
         this.revealIO = new IntersectionObserver((es) => {
           if (!es[0].isIntersecting) return;
           this.revealIO.disconnect();
-          requestAnimationFrame(() => requestAnimationFrame(() => this.classList.add('is-revealed')));
+          const reveal = () => requestAnimationFrame(() => requestAnimationFrame(() => this.classList.add('is-revealed')));
+          // the page loader is still up: play the entrance as it wipes away, not hidden behind it
+          if (document.documentElement.classList.contains('is-loading')) {
+            addEventListener('ascend:ready', () => { reveal(); this.restartBar(); }, { once: true });
+          } else reveal();
         }, { threshold: 0, rootMargin: '0px 0px -22% 0px' });
         this.revealIO.observe(this);
       }

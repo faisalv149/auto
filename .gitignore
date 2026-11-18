@@ -14,3 +14,9 @@ node_modules/
 
 # Logs
 *.log
+
+# Vercel CLI link (local)
+.vercel/
+
+.vercel
+.env*

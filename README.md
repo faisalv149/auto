@@ -31,6 +31,9 @@ Serve it over HTTP rather than opening `index.html` as a file. The page reads ea
 | `assets/brand/` | Logo and photos from the current site |
 | `data/` | Inventory and business details crawled from ascendautos.com |
 | `tools/prep-car.py` | Crops a car cut-out and exports both sizes |
+| `tools/fetch-gallery.py` | Downloads a listing's photos for the "View car" gallery |
+| `css/loader.css`, `js/loader.js` | Page loader: the animated logo plays, then wipes away to reveal the site |
+| `tools/trace-logo.js` | Traces `assets/brand/logo.png` into the animated SVG and inlines it in the loader (`npm i potrace@2`, then `node tools/trace-logo.js`) |
 
 ## Adding or replacing a car
 

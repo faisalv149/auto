@@ -1,17 +1,18 @@
 /*
  * Ascend Auto: showroom data
  * ---------------------------------------------------------------
- * PLACEHOLDER: all six showroom slots currently reuse the 2014 Acura TL.
- * When the real cut-outs are ready, replace each slot below with its own
- * car (copy the ACURA_TL shape). Everything on the page is generated from
- * this file: ring, ticks, popup pins, spec panel and saved-cars list.
+ * One object per car, listed in `cars` at the bottom. Everything on the page
+ * is generated from this file: carousel, captions, ticks, popup pins and
+ * gallery, spec card and saved-cars list. To add a car, copy one of the
+ * objects below (see README "Adding or replacing a car").
  *
  * Image rules for every car:
- *  - transparent background (WebP or PNG with alpha)
- *  - same 3/4 front angle as the Acura (car facing left)
- *  - cropped tight, tyres touching the bottom edge
+ *  - transparent cut-out (WebP or PNG with alpha); a soft studio shadow is fine
+ *  - same 3/4 front angle as the others (car facing left)
+ *  - processed with tools/prep-car.py (--keep-shadow if it has its own shadow)
  *  - `src` about 800px wide, `large` the full-size original
  *  - `w`/`h` = natural size of `large` (sets the aspect ratio)
+ * Specs: exact wording and order from the ascendautos.com listing.
  *
  * Pins: x / y are percentages of the image box; they are numbered in the
  * order the pinned specs appear, and link to the matching spec row.
@@ -166,16 +167,14 @@
     ]
   };
 
-  // Six showroom slots, in order. Real cars first; the rest still reuse the
-  // Acura as a placeholder until their cut-outs arrive.
-  const placeholder = (slot) => ({ ...ACURA_TL, id: ACURA_TL.id + '-slot' + slot, placeholder: true });
+  // Showroom cars, in order. Add a new car object above and list it here;
+  // the carousel, progress ticks, captions and spec card adapt to the count.
   const cars = [
     ACURA_TL,
     AUDI_Q3,
     FORD_MUSTANG,
     FORD_F150,
-    NISSAN_ALTIMA,
-    placeholder(6)
+    NISSAN_ALTIMA
   ];
 
   window.ASCEND = { dealer: DEALER, cars };
