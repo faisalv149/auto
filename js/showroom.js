@@ -200,6 +200,12 @@
             <span class="rw__sweep" aria-hidden="true"></span>
             <span class="rw__cursor" data-rw-cursor aria-hidden="true"><span class="rw__cursor-in"><span class="rw__cursor-label rw__cursor-drag">Drag</span><span class="rw__cursor-label rw__cursor-view">View</span></span></span>
             <span class="rw__walk" aria-hidden="true"><span class="rw__walk-line"></span></span>
+            <span class="rw__hint" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12.5V5.8a1.4 1.4 0 0 1 2.8 0V11m0-1.6a1.4 1.4 0 0 1 2.8 0V11m0-.6a1.4 1.4 0 0 1 2.8 0v1.4m0-.4a1.4 1.4 0 0 1 2.8 0v3.4a5.8 5.8 0 0 1-5.8 5.8h-1.2a5.8 5.8 0 0 1-4.5-2.1l-3-3.7a1.4 1.4 0 0 1 2.2-1.8L9 14.6"/><path d="M3.5 6.5h3M3.5 6.5l1.3-1.3M3.5 6.5l1.3 1.3M18.5 3.5h3m0 0-1.3-1.3m1.3 1.3-1.3 1.3"/></svg>
+              Swipe to browse
+            </span>
+            <button class="rw__edge rw__edge--prev" type="button" data-rw-prev aria-label="Previous car"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
+            <button class="rw__edge rw__edge--next" type="button" data-rw-next aria-label="Next car"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
           </div>
           <div class="rw__controls">
             <button class="rw__icon" type="button" data-rw-prev aria-label="Previous car">${ARROW_L}</button>
@@ -435,7 +441,7 @@
         // big car, but never taller than ~45% of the screen (landscape tablets)
         // landscape tablets have little height: keep the whole car above the fold
         const carH = Math.round(Math.min(Wp * 0.8 / this.maxAr, innerHeight * (innerWidth > innerHeight ? 0.3 : 0.45)));
-        this.stage.style.height = Math.round(carH + 166 + this.captionHeight()) + 'px';
+        this.stage.style.height = Math.round(carH + 180 + this.captionHeight()) + 'px';   // +room for the swipe hint
       }
       this.placePanel(phone);
       const r = this.stage.getBoundingClientRect();
@@ -467,7 +473,7 @@
           (H - capRoom - (phone ? 44 : 34)) / fs)));
         const vis = modelH * this.maxAr * fs;                 // on-screen width of the active car
         hx = clamp(Math.min(0.5 * W, FW - EDGE - vis / 2), EDGE + vis / 2, W - EDGE - vis / 2);
-        hy = phone ? 44 : Math.round(clamp(34 + (H - modelH * fs - capRoom - 34) * 0.45, 34, 200));
+        hy = phone ? 58 : Math.round(clamp(34 + (H - modelH * fs - capRoom - 34) * 0.45, 34, 200));
         this.unit = Math.max(120, 0.45 * W);
         // neighbours: centred on the screen edges (half visible, blurred), shrunk if needed
         // so they keep a clear gap from the active car
@@ -609,6 +615,24 @@
       const h = Math.min(this.panel.scrollHeight, band);
       this.style.setProperty('--rw-panel-top', Math.round(top + Math.max(0, (band - h) / 2)) + 'px');
       this.style.setProperty('--rw-panel-tf', 'none');
+    }
+    /* ----- swipe affordance (compact screens): a peek nudge + "Swipe to browse" hint ----- */
+    scheduleHint() {
+      if (!this.phone) { this.hinted(); return; }
+      clearTimeout(this.hintT1); clearTimeout(this.hintT2);
+      this.hintT1 = setTimeout(() => this.hintNudge(), 1500);
+      this.hintT2 = setTimeout(() => this.hinted(), 9000);      // fade the hint out on its own
+    }
+    hintNudge() {
+      if (!this.phone || reduced() || this.classList.contains('rw--hinted') || this.dragging || this.zoomed) return;
+      const base = Math.round(this.target), peek = base + 0.24;
+      this.target = peek; this.setStill(false); this.kick();      // cars, caption and floor slide toward the next car...
+      setTimeout(() => { if (this.target === peek && !this.dragging) { this.target = base; this.kick(); } }, 560);  // ...and spring back
+    }
+    hinted() {
+      if (this.classList.contains('rw--hinted')) return;
+      this.classList.add('rw--hinted');
+      clearTimeout(this.hintT1); clearTimeout(this.hintT2);
     }
     captionHeight() {
       let h = 0;
@@ -1014,7 +1038,7 @@
         this.revealIO = new IntersectionObserver((es) => {
           if (!es[0].isIntersecting) return;
           this.revealIO.disconnect();
-          const reveal = () => requestAnimationFrame(() => requestAnimationFrame(() => this.classList.add('is-revealed')));
+          const reveal = () => requestAnimationFrame(() => requestAnimationFrame(() => { this.classList.add('is-revealed'); this.scheduleHint(); }));
           // the page loader is still up: play the entrance as it wipes away, not hidden behind it
           if (document.documentElement.classList.contains('is-loading')) {
             addEventListener('ascend:ready', () => { reveal(); this.restartBar(); }, { once: true });
@@ -1036,10 +1060,10 @@
       if (shot) return this.showShot(+shot.dataset.rwShot);
       if (this.zoomed && t.closest('[data-rw-lb]') && !t.closest('.rw__lb-model, .rw__lb-top, .rw__lb-thumbs, .rw__lb-photo img')) return this.closeZoom();
       if (t.closest('[data-rw-zoom]')) return this.openZoom();
-      if (t.closest('[data-rw-next]')) return this.next();
-      if (t.closest('[data-rw-prev]')) return this.prev();
+      if (t.closest('[data-rw-next]')) { this.hinted(); return this.next(); }
+      if (t.closest('[data-rw-prev]')) { this.hinted(); return this.prev(); }
       const tick = t.closest('[data-rw-tick]');
-      if (tick) return this.go(+tick.dataset.rwTick);
+      if (tick) { this.hinted(); return this.go(+tick.dataset.rwTick); }
       if (t.closest('[data-rw-auto]')) { if (!this.playing) this.engaged = false; return this.play(!this.playing); }
       const pin = t.closest('[data-rw-pin]');
       if (pin) { this.engage(); return this.hot(+pin.dataset.rwPin, true); }
@@ -1084,7 +1108,7 @@
       if (!d.active) {
         if (Math.abs(dy) > 10 && Math.abs(dy) >= Math.abs(dx)) { this.drag = null; return; }
         if (Math.abs(dx) > 8 && Math.abs(dx) > 1.2 * Math.abs(dy)) {
-          d.active = true; this.dragging = true;
+          d.active = true; this.dragging = true; this.hinted();
           this.classList.add('rw--dragging');
           try { this.stage.setPointerCapture(e.pointerId); } catch { /* ignore */ }
           this.setStill(false);
