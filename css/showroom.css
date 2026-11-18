@@ -730,9 +730,11 @@ runway-section[data-shadow="image"] .rw__ground { display: none; }
   .rw__left { height: 100%; }
   /* iOS-style glass card: sized to its content, centred vertically */
   .rw__panel {
-    position: absolute; top: 50%; right: 24px; transform: translateY(-50%);
+    /* JS places it in the band between the head row and the controls (see placePanel) */
+    position: absolute; right: 24px;
+    top: var(--rw-panel-top, 50%); transform: var(--rw-panel-tf, translateY(-50%));
     z-index: 50; /* stays above the "View car" popup */
-    width: var(--rw-panel-w); max-height: calc(100% - 40px);
+    width: var(--rw-panel-w); max-height: var(--rw-panel-maxh, calc(100% - 40px));
     display: flex; flex-direction: column;
     border-radius: 30px; overflow: hidden; isolation: isolate;
     border: 1px solid rgb(255 255 255 / .7);
@@ -780,9 +782,7 @@ runway-section[data-shadow="image"] .rw__ground { display: none; }
   .rw__bundle { background: transparent; border-top-color: rgb(21 20 19 / .1); padding: 16px var(--rw-pad) 20px; gap: 12px; }
   .rw__cta { border-radius: 16px; min-height: 52px; }
   .rw__add::before, .rw__add::after { border-radius: 50%; }
-  /* keep the head, controls and popup clear of the card */
-  .rw__head { padding-right: calc(var(--rw-panel-w) + 56px); }
-  .rw__controls { padding-right: calc(var(--rw-panel-w) + 44px); }
+  /* head row and controls run full width (the card sits between them); popup stays clear of the card */
   .rw__lb-stage { right: calc(var(--rw-panel-w) + 64px); }
   .rw__lb-top { padding-right: calc(var(--rw-panel-w) + 52px); }
 }

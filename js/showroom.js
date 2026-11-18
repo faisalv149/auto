@@ -424,8 +424,9 @@
         this.style.removeProperty('--rw-frame-h');
         const Wp = this.stage.clientWidth || innerWidth;
         const carH = Math.round(Wp * 0.8 / this.maxAr);
-        this.stage.style.height = Math.round(carH + 150 + this.captionHeight()) + 'px';
+        this.stage.style.height = Math.round(carH + 166 + this.captionHeight()) + 'px';
       }
+      this.placePanel(phone);
       const r = this.stage.getBoundingClientRect();
       const W = this.W = Math.max(1, r.width);
       const H = this.H = Math.max(1, r.height);
@@ -442,7 +443,7 @@
       if (ring) {
         // one car in focus: big and centred in the free area, neighbours peek in at its edges
         const wShare = phone ? 0.84 : 0.72;
-        const capRoom = this.captionHeight() + (phone ? 28 : 44);   // caption + gaps above the car
+        const capRoom = this.captionHeight() + (phone ? 44 : 80);   // caption + gaps above the car
         modelH = Math.max(110, Math.round(Math.min(
           (H * (phone ? 0.62 : 0.66)) / fs,
           (FW * wShare) / (this.maxAr * fs),
@@ -457,7 +458,7 @@
       }
       this.modelH = modelH; this.hx = hx; this.hy = hy;
       // caption sits just above the car's roof, centred over the active car
-      this.stage.style.setProperty('--rw-cap-bottom', Math.round(hy + modelH * fs + (phone ? 12 : 20)) + 'px');
+      this.stage.style.setProperty('--rw-cap-bottom', Math.round(hy + modelH * fs + (phone ? 28 : 48)) + 'px');
       this.capShift = phone ? Math.min(140, W * 0.32) : Math.min(260, FW * 0.26);
       this.stage.style.setProperty('--rw-model-h', modelH + 'px');
       this.stage.style.setProperty('--rw-hx', hx + 'px');
@@ -550,6 +551,21 @@
     }
     wrap(v) { const N = this.N; let r = ((v % N) + N) % N; if (r > N / 2) r -= N; return r; }
 
+    // Desktop: centre the floating card in the band between the head row and the
+    // controls, so it never overlaps them now that both run full width.
+    placePanel(phone) {
+      if (phone || !this.panel) { ['--rw-panel-top', '--rw-panel-tf', '--rw-panel-maxh'].forEach((k) => this.style.removeProperty(k)); return; }
+      const g = this.querySelector('.rw__grid').getBoundingClientRect();
+      const head = this.querySelector('.rw__head').getBoundingClientRect();
+      const ctl = this.querySelector('.rw__controls').getBoundingClientRect();
+      const top = head.bottom - g.top + 16;
+      const bottom = (ctl.height ? ctl.top : g.bottom) - g.top - 12;
+      const band = Math.max(240, bottom - top);
+      this.style.setProperty('--rw-panel-maxh', band + 'px');
+      const h = Math.min(this.panel.scrollHeight, band);
+      this.style.setProperty('--rw-panel-top', Math.round(top + Math.max(0, (band - h) / 2)) + 'px');
+      this.style.setProperty('--rw-panel-tf', 'none');
+    }
     captionHeight() {
       let h = 0;
       (this.caps || []).forEach((el) => { h = Math.max(h, el.offsetHeight); });
