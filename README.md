@@ -44,5 +44,10 @@ Serve it over HTTP rather than opening `index.html` as a file. The page reads ea
 3. Add an entry to `js/cars.js`: copy an existing car and change the name, body, price, mileage, stock, VIN, listing URL, image paths and `w`/`h` (from step 2).
 4. Copy the specs **exactly as worded on the ascendautos.com listing**, in this order: Engine, Transmission, Drivetrain, Exterior Color, Interior Color, Fuel Economy.
 5. Set `pin: { x, y }` (percent of the image box) on the specs you want pinned on the car in the close-up view.
+6. Fetch the listing's photos for the "View car" gallery (uses the URLs in `data/inventory.json`):
+   ```bash
+   python tools/fetch-gallery.py <stock#> <slug>      # e.g. 2102 acura-tl-2014
+   ```
+   Then add `gallery: { dir: 'assets/cars/gallery/<slug>', count: <photos> }` to the car in `js/cars.js`.
 
 Only show information that's on the dealer's existing listing.

@@ -40,6 +40,7 @@
     vin: '19UUA8F20EA009161',
     note: 'ONE OWNER AND TIMING BELT DONE 120K',   // the listing's own description, verbatim
     url: 'https://www.ascendautos.com/details/used-2014-acura-tl/128854926',
+    gallery: { dir: 'assets/cars/gallery/acura-tl-2014', count: 11 },   // listing photos (tools/fetch-gallery.py)
     image: {
       src: 'assets/cars/acura-tl-2014-800.webp',
       large: 'assets/cars/acura-tl-2014.webp',
@@ -67,6 +68,7 @@
     vin: 'WA1BCCFS4JR026117',
     note: '',
     url: 'https://www.ascendautos.com/details/used-2018-audi-q3/130594345',
+    gallery: { dir: 'assets/cars/gallery/audi-q3-2018', count: 12 },
     image: {
       src: 'assets/cars/audi-q3-2018-800.webp',
       large: 'assets/cars/audi-q3-2018.webp',
@@ -93,6 +95,7 @@
     vin: '1ZVBP8AM8B5141695',
     note: '',
     url: 'https://www.ascendautos.com/details/used-2011-ford-mustang/129907494',
+    gallery: { dir: 'assets/cars/gallery/ford-mustang-2011', count: 11 },
     image: {
       src: 'assets/cars/ford-mustang-2011-800.webp',
       large: 'assets/cars/ford-mustang-2011.webp',
@@ -119,6 +122,7 @@
     vin: '1FTMF1CM7EFA55912',
     note: '',
     url: 'https://www.ascendautos.com/details/used-2014-ford-f-150/133647478',
+    gallery: { dir: 'assets/cars/gallery/ford-f150-2014', count: 10 },
     image: {
       src: 'assets/cars/ford-f150-2014-800.webp',
       large: 'assets/cars/ford-f150-2014.webp',
@@ -145,6 +149,7 @@
     vin: '1N4AL24E38C282258',
     note: '',
     url: 'https://www.ascendautos.com/details/used-2008-nissan-altima/133355834',
+    gallery: { dir: 'assets/cars/gallery/nissan-altima-2008', count: 12 },
     image: {
       src: 'assets/cars/nissan-altima-2008-800.webp',
       large: 'assets/cars/nissan-altima-2008.webp',

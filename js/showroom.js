@@ -37,6 +37,7 @@
   const I_ARROW_R = SVG('<path d="M1 7h24M19 1l6 6-6 6"/>', 26, 14, 'width="22" height="12" stroke-width="1.4"');
   const I_PLUS = SVG('<path d="M12 4v16M4 12h16"/>', 24, 24, 'class="rw__i-plus" width="20" height="20"');
   const I_CHECK = SVG('<path d="M4.5 12.5l5 5L19.5 7"/>', 24, 24, 'class="rw__i-check" width="20" height="20" stroke-width="1.5"');
+  const I_PHONE = SVG('<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>', 24, 24, 'width="17" height="17" stroke-width="1.6"');
   const I_X = SVG('<path d="M5 5l14 14M19 5L5 19"/>', 24, 24, 'width="16" height="16" stroke-width="1.5"');
 
   /* ---------- ground shadow (follows the car's footprint) ---------- */
@@ -136,13 +137,10 @@
       <ul class="rw__items" role="list">${rows}</ul>
       <div class="rw__bundle">
         <!-- the same actions the ascendautos.com listing offers: call, value my trade, the listing itself -->
-        <a class="rw__cta" href="tel:${DEALER.tel}" aria-label="Call ${esc(DEALER.name)} about the ${esc(c.name)}: ${esc(DEALER.phone)}">
-          <span class="rw__cta-add">Call ${esc(DEALER.phone)}</span>
-          ${I_ARROW_R}
-        </a>
         <div class="rw__links">
           <a href="${esc(DEALER.site)}/contact?form=appraisal" target="_blank" rel="noopener noreferrer">Value My Trade ↗</a>
           <a href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">View full listing ↗</a>
+          <a class="rw__call" href="tel:${DEALER.tel}" aria-label="Call ${esc(DEALER.name)} about the ${esc(c.name)}: ${esc(DEALER.phone)}" title="Call ${esc(DEALER.phone)}">${I_PHONE}</a>
         </div>
       </div>
     </div>`;
@@ -186,7 +184,7 @@
           <div class="rw__head">
             <div class="rw__intro">
               <p class="rw__eyebrow">Ascend Auto · Buda, TX</p>
-              <h2 class="rw__title">Find your next car.</h2>
+              <h2 class="rw__title">Find your next car<span class="rw__title-dot">.</span></h2>
               <p class="rw__sub">Every car on our lot is hand-picked for reliability, quality and condition. Drag to browse, then tap a car for a closer look.</p>
             </div>
             <a class="rw__all" href="${esc(DEALER.inventoryUrl)}" target="_blank" rel="noopener noreferrer">Browse all ${DEALER.inStock} cars ${I_ARROW_R}</a>
@@ -212,6 +210,8 @@
           </div>
           <div class="rw__lb" data-rw-lb data-word="Car" role="region" aria-label="View car" aria-hidden="true">
             <div class="rw__lb-stage" data-rw-lb-stage></div>
+            <div class="rw__lb-photo" data-rw-lb-photo aria-live="polite"><img alt="" decoding="async"></div>
+            <div class="rw__lb-thumbs" data-rw-lb-thumbs role="tablist" aria-label="Photos"></div>
             <div class="rw__lb-top">
               <p class="rw__lb-cap"><span class="rw__lb-kicker" data-rw-lb-kicker></span><span class="rw__lb-name" data-rw-lb-name></span></p>
               <button class="rw__lb-close" type="button" data-rw-zoom-close aria-label="Close">${I_X}</button>
@@ -316,6 +316,8 @@
       this.pieces = q('[data-rw-pieces]');
       this.lb = q('[data-rw-lb]');
       this.lbStage = q('[data-rw-lb-stage]');
+      this.lbPhoto = q('[data-rw-lb-photo]');
+      this.lbThumbs = q('[data-rw-lb-thumbs]');
       this.cursor = q('[data-rw-cursor]');
       this.panel = q('.rw__panel');
       this.caps = $$('[data-rw-cap]', this);
@@ -353,6 +355,8 @@
       this.probeFeet();
       if (this.dataset.autoplay === 'true' && !reduced()) this.play(true);
       this.renderAll();
+      // web fonts (Barlow/Inter) change the headline and caption sizes: re-fit once loaded
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (this.isConnected) { this.measure(); this.kick(); } });
     }
 
     disconnectedCallback() {
@@ -441,15 +445,16 @@
       }
       this.FW = FW;
       if (ring) {
-        // one car in focus: big and centred in the free area, neighbours peek in at its edges
-        const wShare = phone ? 0.84 : 0.72;
+        // one car in focus, centred on the full stage width; it is sized so it never
+        // runs under the floating card (FW = where the card starts)
+        hx = 0.5 * W;
+        const clear = phone ? W * 0.84 : Math.min(W * 0.62, 2 * (FW - hx - 24));
         const capRoom = this.captionHeight() + (phone ? 44 : 80);   // caption + gaps above the car
         modelH = Math.max(110, Math.round(Math.min(
           (H * (phone ? 0.62 : 0.66)) / fs,
-          (FW * wShare) / (this.maxAr * fs),
+          Math.max(W * 0.3, clear) / (this.maxAr * fs),
           (H - capRoom - (phone ? 44 : 34)) / fs)));
         hy = phone ? 44 : Math.round(clamp(34 + (H - modelH * fs - capRoom - 34) * 0.45, 34, 200));
-        hx = 0.5 * FW;
         this.unit = Math.max(120, 0.45 * W);
       } else {
         modelH = Math.max(90, Math.round(W * 0.8 / this.maxAr));
@@ -459,7 +464,7 @@
       this.modelH = modelH; this.hx = hx; this.hy = hy;
       // caption sits just above the car's roof, centred over the active car
       this.stage.style.setProperty('--rw-cap-bottom', Math.round(hy + modelH * fs + (phone ? 28 : 48)) + 'px');
-      this.capShift = phone ? Math.min(140, W * 0.32) : Math.min(260, FW * 0.26);
+      this.capShift = phone ? Math.min(140, W * 0.32) : Math.min(280, W * 0.2);
       this.stage.style.setProperty('--rw-model-h', modelH + 'px');
       this.stage.style.setProperty('--rw-hx', hx + 'px');
       this.stage.style.setProperty('--rw-hy', hy + 'px');
@@ -513,11 +518,11 @@
       svg.innerHTML = `
         <defs>
           <linearGradient id="rwFloorFade" gradientUnits="userSpaceOnUse" x1="0" y1="${f(yh)}" x2="0" y2="${f(H)}">
-            <stop offset="0" stop-color="#151413" stop-opacity="0"/>
-            <stop offset="${((yh + span * 0.15 - yh) / (H - yh)).toFixed(3)}" stop-color="#151413" stop-opacity="0"/>
-            <stop offset="${((fadeTop - yh) / (H - yh)).toFixed(3)}" stop-color="#151413" stop-opacity=".05"/>
-            <stop offset="${((floorY - yh) / (H - yh)).toFixed(3)}" stop-color="#151413" stop-opacity=".11"/>
-            <stop offset="1" stop-color="#151413" stop-opacity=".13"/>
+            <stop offset="0" stop-color="#1c3466" stop-opacity="0"/>
+            <stop offset="${((yh + span * 0.15 - yh) / (H - yh)).toFixed(3)}" stop-color="#1c3466" stop-opacity="0"/>
+            <stop offset="${((fadeTop - yh) / (H - yh)).toFixed(3)}" stop-color="#1c3466" stop-opacity=".05"/>
+            <stop offset="${((floorY - yh) / (H - yh)).toFixed(3)}" stop-color="#1c3466" stop-opacity=".11"/>
+            <stop offset="1" stop-color="#1c3466" stop-opacity=".13"/>
           </linearGradient>
           <radialGradient id="rwFloorEdge" gradientUnits="userSpaceOnUse" cx="${f(hx)}" cy="${f(floorY)}" r="${f(Math.max(W * 0.62, span * 2))}">
             <stop offset="0" stop-color="#fff"/>
@@ -606,8 +611,11 @@
           const t = Math.abs(s), sg = Math.sign(s);
           const p = Math.pow(SIDE, Math.min(t, 1)) * Math.pow(0.85, Math.max(0, t - 1));
           const scale = p * (1 + (fs - 1) * clamp(1 - t, 0, 1));
-          const FW = this.FW || W;
-          const x = hx + sg * FW * (t <= 1 ? 0.5 * t : 0.5 + 0.35 * (t - 1));
+          // neighbour sits a clear gap away from the active car's edge
+          const baseW = modelH * this.maxAr;
+          const GAP = this.phone ? 18 : Math.max(48, W * 0.05);
+          const step1 = baseW * fs / 2 + GAP + baseW * SIDE / 2;   // centre-to-centre at slot ±1
+          const x = hx + sg * (t <= 1 ? step1 * t : step1 + W * 0.35 * (t - 1));
           const bottom = hy + modelH * 0.16 * (1 - Math.pow(SIDE, Math.min(t, 1)));
           const blur = t <= 1 ? BLUR * t : BLUR + 3 * (t - 1);
           let op = t <= 1 ? 1 - 0.18 * t : clamp(0.82 * (1 - (t - 1) / 0.6), 0, 1);
@@ -789,6 +797,7 @@
     openZoom() {
       if (this.zoomed) return;
       this.engage(); this.clearHot();
+      this.buildGallery(this.cars[this.index]);   // first, so the stage is measured with the thumb strip in place
       const hero = this.heroes[this.index];
       const fig = hero.querySelector('.rw__figure');
       const wrap = document.createElement('div'); wrap.className = 'rw__lb-model';
@@ -822,6 +831,46 @@
         }
       }
       this.querySelector('[data-rw-zoom-close]').focus({ preventScroll: true });
+    }
+    /* ----- popup gallery: studio cut-out first, then the listing's photos ----- */
+    galleryOf(c) {
+      const g = c.gallery;
+      if (!g || !g.count) return [];
+      return Array.from({ length: g.count }, (_, k) => {
+        const n = String(k + 1).padStart(2, '0');
+        return { src: `${g.dir}/${n}.jpg`, thumb: `${g.dir}/${n}-thumb.jpg` };
+      });
+    }
+    buildGallery(c) {
+      const shots = this.galleryOf(c);
+      this.shots = shots;
+      const studio = `<button class="rw__shot rw__shot--studio" type="button" role="tab" data-rw-shot="0" aria-label="Studio view with spec dots"><img src="${esc(c.image.src)}" alt="" loading="lazy"><span>Studio</span></button>`;
+      this.lbThumbs.innerHTML = studio + shots.map((s, k) =>
+        `<button class="rw__shot" type="button" role="tab" data-rw-shot="${k + 1}" aria-label="Photo ${k + 1} of ${shots.length}"><img src="${esc(s.thumb)}" alt="" loading="lazy"></button>`).join('');
+      this.lbThumbs.hidden = !shots.length;
+      this.lb.classList.toggle('has-gallery', shots.length > 0);
+      this.showShot(0, true);
+    }
+    showShot(k, silent) {
+      const shots = this.shots || [];
+      k = clamp(k, 0, shots.length);
+      this.shot = k;
+      this.lb.classList.toggle('is-photo', k > 0);
+      $$('[data-rw-shot]', this.lbThumbs).forEach((b) => b.setAttribute('aria-selected', String(+b.dataset.rwShot === k)));
+      const img = this.lbPhoto.querySelector('img');
+      if (k > 0) {
+        const c = this.cars[this.index];
+        img.src = shots[k - 1].src;
+        img.alt = `${c.name}, photo ${k} of ${shots.length}`;
+        this.lbPhoto.classList.remove('is-in'); void this.lbPhoto.offsetWidth; this.lbPhoto.classList.add('is-in');
+        // preload the next photo so arrowing through feels instant
+        if (shots[k]) { const pre = new Image(); pre.src = shots[k].src; }
+      }
+      if (!silent) {
+        this.engage(); this.clearHot();
+        const active = this.lbThumbs.querySelector(`[data-rw-shot="${k}"]`);
+        if (active) active.scrollIntoView({ block: 'nearest', inline: 'center', behavior: reduced() ? 'auto' : 'smooth' });
+      }
     }
     closeZoom() {
       if (!this.zoomed) return;
@@ -936,7 +985,9 @@
       if (!(t instanceof Element)) return;
       if (t.closest('.rw__panel') && t.closest('button, a')) this.engage();
       if (t.closest('[data-rw-zoom-close]')) return this.closeZoom();
-      if (this.zoomed && t.closest('[data-rw-lb]') && !t.closest('.rw__lb-model') && !t.closest('.rw__lb-top')) return this.closeZoom();
+      const shot = t.closest('[data-rw-shot]');
+      if (shot) return this.showShot(+shot.dataset.rwShot);
+      if (this.zoomed && t.closest('[data-rw-lb]') && !t.closest('.rw__lb-model, .rw__lb-top, .rw__lb-thumbs, .rw__lb-photo img')) return this.closeZoom();
       if (t.closest('[data-rw-zoom]')) return this.openZoom();
       if (t.closest('[data-rw-next]')) return this.next();
       if (t.closest('[data-rw-prev]')) return this.prev();
@@ -958,6 +1009,13 @@
     onKey(e) {
       if (e.key === 'Escape') {
         if (this.zoomed) { e.preventDefault(); this.closeZoom(); return; }
+      }
+      // in the popup, ← → step through the gallery
+      if (this.zoomed && (e.key === 'ArrowRight' || e.key === 'ArrowLeft') && this.shots && this.shots.length) {
+        e.preventDefault();
+        const n = this.shots.length + 1;
+        this.showShot((this.shot + (e.key === 'ArrowRight' ? 1 : -1) + n) % n);
+        return;
       }
       if (e.target === this.stage) {
         if (e.key === 'ArrowRight') { e.preventDefault(); this.next(); }
