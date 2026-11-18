@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Ascend Auto: Used Cars in Buda, TX</title>
+  <meta name="description" content="Hand-picked used cars at Ascend Auto in Buda, TX. Browse the showroom, look closer at each car and book a test drive.">
+  <link rel="icon" type="image/png" href="assets/brand/logo-tight.png">
+  <link rel="preload" as="image" href="assets/cars/acura-tl-2014-800.webp" fetchpriority="high">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap">
+  <link rel="stylesheet" href="css/showroom.css">
+</head>
+<body>
+  <header class="site-header">
+    <a href="./" class="brand" aria-label="Ascend Auto home">
+      <img src="assets/brand/logo-tight.png" width="83" height="34" alt="Ascend Autos">
+    </a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="./" aria-current="page">Showroom</a>
+      <a href="https://www.ascendautos.com/cars-for-sale" target="_blank" rel="noopener noreferrer">Inventory</a>
+      <a href="https://www.ascendautos.com/contact?form=appraisal" target="_blank" rel="noopener noreferrer">Trade-in</a>
+      <a href="https://www.ascendautos.com/about" target="_blank" rel="noopener noreferrer">About</a>
+      <a href="https://www.ascendautos.com/contact" target="_blank" rel="noopener noreferrer">Contact</a>
+    </nav>
+    <a class="header-phone" href="tel:+15125985605" aria-label="Call Ascend Auto at (512) 598-5605">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
+      <span>(512) 598-5605</span>
+    </a>
+    <button id="open-garage" class="garage-btn" type="button" aria-label="Open saved cars">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg>
+      <span data-garage-count>0</span>
+    </button>
+  </header>
+
+  <main>
+    <runway-section id="showroom" data-style="ring" data-mstyle="ring" data-blur="true" data-shadow="image" data-autoplay="true" data-speed="5000"></runway-section>
+  </main>
+
+  <dialog id="garage-dialog" aria-labelledby="garage-title">
+    <div class="garage-heading">
+      <h2 id="garage-title">Your saved cars</h2>
+      <button id="close-garage" type="button" aria-label="Close saved cars">×</button>
+    </div>
+    <p class="garage-note">A shortlist kept on this device. Call or visit us at 16400 S IH 35 Frontage Rd., Buda, TX to see them in person.</p>
+    <div id="garage-items"></div>
+    <p id="garage-total"></p>
+    <div class="garage-actions">
+      <a id="call-garage" href="tel:+15125985605">Call (512) 598-5605</a>
+      <button id="export-garage" type="button" disabled>Download my list</button>
+    </div>
+  </dialog>
+
+  <div id="garage-status" role="status" aria-live="polite"></div>
+
+  <script src="js/cars.js" defer></script>
+  <script src="js/showroom.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "source": "https://www.ascendautos.com/ (crawled 2026-11-18)",
+  "name": "Ascend Auto",
+  "nameVariants": ["Ascend Auto", "Ascend Autos"],
+  "type": "Small family owned and operated used car dealership",
+  "address": {
+    "street": "16400 S IH 35 Frontage Rd.",
+    "city": "Buda",
+    "state": "TX",
+    "zip": "78610",
+    "mapsQuery": "16400 S IH 35 Frontage Rd, Buda, TX 78610"
+  },
+  "phone": "(512) 598-5605",
+  "phoneAltInSchema": "(512) 557-8283",
+  "hours": {
+    "Monday": "10:30 AM - 6:00 PM",
+    "Tuesday": "10:30 AM - 6:00 PM",
+    "Wednesday": "10:30 AM - 6:00 PM",
+    "Thursday": "10:30 AM - 6:00 PM",
+    "Friday": "10:30 AM - 6:00 PM",
+    "Saturday": "10:30 AM - 3:00 PM",
+    "Sunday": "Closed"
+  },
+  "copy": {
+    "banner": "We want your vehicle! Get the best value for your trade-in!",
+    "hero": "Find your next car at Ascend Auto in Buda, TX",
+    "section": "The Best Cars For The Best Prices / Shop & Save Today!",
+    "about": "Ascend Autos is a small family owned and operated used car dealership in Buda Texas. We pride ourselves on providing our customers with a quality used vehicle at the lowest possible prices without compromising quality or customer service. Every car we sell is hand picked based on reliability, quality, and condition. We specialize in top quality inventory with a wide variety of options and styles. Our experienced, friendly staff is here to help you find what not only fits your lifestyle, but also your budget! We encourage you to browse our inventory online and to stop by and explore all that we have to offer today. We look forward to meeting you!"
+  },
+  "services": ["Used vehicle sales", "Trade-in appraisal (Value My Trade)", "Email for price / info requests"],
+  "testimonials": [],
+  "social": [],
+  "brand": {
+    "logo": "assets/brand/logo.png (black monochrome, 1200x300, transparent)",
+    "colors": {"accentFromSite": "#0D39A1", "themeGreys": ["#333333", "#595959", "#999999", "#e3e3e3"]},
+    "heroImages": ["assets/brand/hero1.jpg", "assets/brand/hero2.jpg", "assets/brand/hero3.jpg", "assets/brand/hero4.jpg"]
+  },
+  "inventorySummary": {
+    "file": "data/inventory.json",
+    "total": 37,
+    "available": 28,
+    "sold": 9,
+    "priceRange": "$4,899 - $18,999",
+    "bodyStyles": {"SUV": 10, "Pickup Truck": 9, "Sedan": 9, "Coupe": 4, "Wagon": 4, "Hatchback": 1}
+  },
+  "platform": "Carsforsale.com dealer template (photos on cdn05.carsforsale.com, 800x600 galleries)"
+}
