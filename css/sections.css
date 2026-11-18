@@ -1,0 +1,244 @@
+/* =========================================================
+   Below the showroom: Google reviews, Locate us, footer
+   ========================================================= */
+.sec { padding: clamp(64px, 8vw, 120px) clamp(20px, 5vw, 72px); background: #fff; }
+.sec__inner { max-width: 1240px; margin: 0 auto; }
+.sec__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: clamp(28px, 4vw, 48px); }
+.sec__eyebrow {
+  display: inline-flex; align-items: center; gap: 10px; margin: 0 0 14px;
+  font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #66625c;
+}
+.sec__eyebrow::before { content: ""; width: 18px; height: 2px; border-radius: 2px; background: var(--brand-red); }
+.sec__title {
+  margin: 0; font-family: var(--font-display); font-weight: 600; color: var(--brand-navy);
+  font-size: clamp(34px, 3.6vw + 6px, 64px); line-height: 1; letter-spacing: -.01em;
+}
+/* reveal on scroll */
+.sec .sec__inner { opacity: 0; transform: translateY(26px); transition: opacity 1s cubic-bezier(.16, 1, .3, 1), transform 1.2s cubic-bezier(.16, 1, .3, 1); }
+.sec.is-in .sec__inner { opacity: 1; transform: none; }
+
+/* buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 50px; padding: 0 24px; border-radius: 999px; font: 600 14px/1 var(--font-body);
+  transition: transform .4s cubic-bezier(.2, 1.5, .4, 1), box-shadow .4s, background .3s, color .3s;
+}
+.btn--primary { background: var(--brand-navy); color: #fff; }
+.btn--primary:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -16px rgb(28 52 102 / .7); }
+.btn--ghost { border: 1px solid var(--brand-navy); color: var(--brand-navy); }
+.btn--ghost:hover { background: var(--brand-navy); color: #fff; }
+
+/* ---------- Reviews ---------- */
+.reviews__summary { display: flex; align-items: center; gap: 16px; }
+.reviews__score { font-family: var(--font-head); font-weight: 600; font-size: 56px; line-height: 1; color: var(--brand-navy); }
+.reviews__meta { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #66625c; }
+.stars { display: inline-flex; gap: 2px; }
+.stars svg { width: 18px; height: 18px; display: block; }
+.reviews__list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.review {
+  display: flex; flex-direction: column; gap: 14px; padding: 26px;
+  border-radius: 22px; background: linear-gradient(180deg, #fff, #f8f9fc);
+  border: 1px solid rgb(28 52 102 / .08);
+  box-shadow: 0 24px 50px -36px rgb(20 16 12 / .35);
+}
+.review__head { display: flex; align-items: center; gap: 12px; }
+.review__head > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.review__avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex: none; }
+.review__avatar--initial { display: grid; place-items: center; background: var(--brand-navy); color: #fff; font: 600 16px/1 var(--font-head); }
+.review__name { font: 600 15px/1.2 var(--font-head); color: var(--brand-navy); }
+.review__name:hover { text-decoration: underline; text-underline-offset: 3px; }
+.review__when { font-size: 12px; color: #66625c; }
+.review__text {
+  margin: 0; font-size: 15px; line-height: 1.6; color: #2b2a28;
+  display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden;
+}
+.review__more { margin-top: auto; font-size: 12px; color: var(--brand-navy); }
+.review__more:hover { text-decoration: underline; text-underline-offset: 3px; }
+.review--skeleton { min-height: 220px; position: relative; overflow: hidden; background: #f1f3f8; }
+.review--skeleton::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / .7) 50%, transparent 70%);
+  animation: rv-shimmer 1.3s linear infinite;
+}
+@keyframes rv-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+.review--cta { grid-column: 1 / -1; align-items: center; text-align: center; padding: clamp(32px, 5vw, 56px); gap: 12px; }
+.review__cta-title { margin: 0; font: 600 clamp(22px, 2vw, 28px)/1.1 var(--font-head); color: var(--brand-navy); }
+.review__cta-text { margin: 0 0 8px; font-size: 15px; color: #66625c; }
+.reviews__attr { margin: 24px 0 0; font-size: 12px; color: #66625c; }
+.reviews__attr a { color: var(--brand-navy); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- Locate us ---------- */
+.visit { background: #ffffff; border-top: 1px solid #eef0f4; }
+.visit__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 4vw, 64px); align-items: stretch; }
+.visit__info { display: flex; flex-direction: column; }
+.visit__addr { font-style: normal; margin: 26px 0 8px; font: 500 20px/1.45 var(--font-head); color: #2b2a28; }
+.visit__status { margin: 0 0 22px; font-size: 13px; color: #66625c; display: inline-flex; align-items: center; gap: 8px; }
+.visit__status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #b5b0a8; }
+.visit__status.is-open::before { background: #2f9e5b; box-shadow: 0 0 0 4px rgb(47 158 91 / .15); }
+.visit__hours { width: 100%; max-width: 420px; border-collapse: collapse; font-size: 14px; margin-bottom: 28px; }
+.visit__hours th, .visit__hours td { padding: 10px 0; border-bottom: 1px solid rgb(28 52 102 / .1); text-align: left; font-weight: 400; color: #4a4844; }
+.visit__hours td { text-align: right; font-variant-numeric: tabular-nums; }
+.visit__hours tr.is-today th, .visit__hours tr.is-today td { color: var(--brand-navy); font-weight: 600; }
+.visit__hours tr.is-today th::after { content: "Today"; margin-left: 8px; padding: 2px 8px; border-radius: 999px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; background: var(--brand-red); color: #fff; vertical-align: 1px; }
+.visit__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: auto; }
+.visit__map {
+  min-height: 420px; border-radius: 26px; overflow: hidden; background: #e4e9f1;
+  box-shadow: 0 30px 60px -36px rgb(20 16 12 / .45), 0 0 0 1px rgb(28 52 102 / .08);
+}
+.visit__map iframe { display: block; width: 100%; height: 100%; min-height: 420px; border: 0; filter: saturate(.85); }
+
+/* ---------- Footer ---------- */
+.site-footer { background: #fff; border-top: 1px solid #e4e4e4; padding: 36px clamp(20px, 5vw, 72px); }
+.site-footer__inner { max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; font-size: 13px; color: #66625c; }
+.site-footer__inner img { display: block; height: 30px; width: auto; }
+.site-footer__inner p { margin: 0; }
+.site-footer__inner a:hover { color: var(--brand-navy); text-decoration: underline; text-underline-offset: 3px; }
+.site-footer nav { display: flex; gap: 18px; margin-left: auto; }
+.site-footer__small { width: 100%; font-size: 12px; }
+
+@media (max-width: 860px) {
+  .visit__grid { grid-template-columns: 1fr; }
+  .visit__map, .visit__map iframe { min-height: 320px; }
+  .site-footer nav { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sec .sec__inner { opacity: 1; transform: none; transition: none; }
+  .review--skeleton::after { animation: none; }
+}
+.site-footer a[href^="tel"], .visit__actions .btn { white-space: nowrap; }
+
+/* =========================================================
+   Quick-action dock: iOS-style glass. Text Roger / Call / Find us.
+   Desktop: vertical on the right edge. Phones: bar at the bottom.
+   ========================================================= */
+.dock {
+  position: fixed; z-index: 2147482000; right: 16px; top: 50%;
+  transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 10px; padding: 10px;
+  border-radius: 28px; isolation: isolate;
+  background: linear-gradient(160deg, rgb(255 255 255 / .62), rgb(255 255 255 / .36));
+  -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgb(255 255 255 / .7);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .9), inset 0 -1px 0 rgb(255 255 255 / .3),
+              0 24px 50px -24px rgb(20 16 12 / .35), 0 8px 20px -12px rgb(20 16 12 / .2);
+  transition: opacity .6s cubic-bezier(.16, 1, .3, 1), transform .9s cubic-bezier(.16, 1, .3, 1);
+}
+html.is-loading .dock { opacity: 0; transform: translate(40px, -50%); }
+.dock__btn {
+  position: relative; width: 52px; height: 52px; border-radius: 18px;
+  display: grid; place-items: center; color: var(--brand-navy);
+  background: rgb(255 255 255 / .78);
+  box-shadow: inset 0 0 0 .5px rgb(28 52 102 / .1), 0 6px 14px -10px rgb(20 16 12 / .45);
+  transition: transform .45s cubic-bezier(.34, 1.56, .64, 1), background .25s, color .25s, box-shadow .3s;
+}
+.dock__btn svg { width: 23px; height: 23px; }
+.dock__btn:hover, .dock__btn:focus-visible { background: var(--brand-navy); color: #fff; transform: scale(1.07); outline: none; }
+.dock__btn:focus-visible { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--brand-red); }
+.dock__btn:active { transform: scale(.94); }
+.dock__btn--primary { background: var(--brand-navy); color: #fff; box-shadow: 0 10px 22px -12px rgb(28 52 102 / .8); }
+.dock__btn--primary:hover { background: #142a55; }
+.dock__btn--primary::after {   /* small red "live" dot: texting goes straight to Roger */
+  content: ""; position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--brand-red); box-shadow: 0 0 0 2px var(--brand-navy);
+}
+.dock__tip {
+  position: absolute; right: calc(100% + 14px); top: 50%;
+  transform: translate(6px, -50%); white-space: nowrap; pointer-events: none;
+  padding: 8px 12px; border-radius: 999px; font: 600 12px/1 var(--font-body); color: var(--brand-navy);
+  background: rgb(255 255 255 / .94); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: 0 10px 24px -12px rgb(20 16 12 / .4), 0 0 0 .5px rgb(28 52 102 / .1);
+  opacity: 0; transition: opacity .25s, transform .45s cubic-bezier(.16, 1, .3, 1);
+}
+.dock__btn:hover .dock__tip, .dock__btn:focus-visible .dock__tip { opacity: 1; transform: translate(0, -50%); }
+
+/* desktop: make room for the dock beside the floating spec card */
+@media (min-width: 1100px) {
+  runway-section .rw__panel { right: 92px; }
+}
+/* phones: horizontal glass bar at the bottom */
+@media (max-width: 749px) {
+  .dock {
+    top: auto; right: 50%; bottom: calc(14px + env(safe-area-inset-bottom));
+    transform: translateX(50%); flex-direction: row; gap: 8px; padding: 8px; border-radius: 24px;
+  }
+  html.is-loading .dock { transform: translate(50%, 40px); }
+  .dock__btn { width: 50px; height: 50px; border-radius: 16px; }
+  .dock__tip { display: none; }
+  body { padding-bottom: 84px; }   /* footer stays readable above the bar */
+  runway-section .rw__links .rw__call { display: none; }          /* the dock already has Call */
+  runway-section .rw__bundle { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }  /* links sit above the bar */
+}
+@media (prefers-reduced-motion: reduce) {
+  .dock, .dock__btn, .dock__tip { transition: none !important; }
+}
+
+/* demo-mode sample cards (layout preview only) */
+.review--sample { position: relative; border-style: dashed; border-color: rgb(28 52 102 / .25); }
+.review__badge {
+  align-self: flex-start; padding: 4px 10px; border-radius: 999px;
+  font: 600 10px/1.2 var(--font-body); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--brand-red); background: rgb(224 69 58 / .1); border: 1px solid rgb(224 69 58 / .25);
+}
+.review__badge--inline { font-size: 11px; }
+
+/* ---------- Dock: iOS "liquid glass" finish ---------- */
+.dock {
+  background: linear-gradient(150deg, rgb(255 255 255 / .24) 0%, rgb(255 255 255 / .06) 55%, rgb(255 255 255 / .16) 100%);
+  -webkit-backdrop-filter: blur(22px) saturate(210%) brightness(1.06);
+  backdrop-filter: blur(22px) saturate(210%) brightness(1.06);
+  border: 0;
+  box-shadow:
+    inset 0 0 0 .5px rgb(255 255 255 / .35),
+    inset 0 12px 24px -16px rgb(255 255 255 / .9),     /* inner glow from the top */
+    inset 0 -10px 20px -14px rgb(28 52 102 / .14),     /* slight depth at the bottom */
+    0 1px 2px rgb(20 16 12 / .06),
+    0 22px 48px -20px rgb(20 16 12 / .38);
+}
+/* light-catching rim: bright top-left and bottom-right, fading along the sides */
+.dock::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.2px; pointer-events: none; z-index: 0;
+  background: linear-gradient(140deg, rgb(255 255 255 / .98) 0%, rgb(255 255 255 / .25) 32%, rgb(255 255 255 / .06) 55%, rgb(255 255 255 / .2) 75%, rgb(255 255 255 / .85) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+/* specular sheen across the top */
+.dock::after {
+  content: ""; position: absolute; inset: 1px; border-radius: inherit; pointer-events: none; z-index: 0;
+  background: radial-gradient(130% 55% at 25% -5%, rgb(255 255 255 / .6), transparent 55%);
+}
+.dock__btn { z-index: 1; }
+
+/* buttons: translucent glass tiles with their own rim */
+.dock__btn {
+  background: linear-gradient(160deg, rgb(255 255 255 / .5), rgb(255 255 255 / .16));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .95),
+    inset 0 0 0 .5px rgb(255 255 255 / .6),
+    inset 0 -1px 0 rgb(28 52 102 / .06),
+    0 6px 14px -8px rgb(20 16 12 / .28);
+}
+.dock__btn:hover, .dock__btn:focus-visible {
+  background: linear-gradient(160deg, rgb(255 255 255 / .9), rgb(255 255 255 / .6));
+  color: var(--brand-navy); transform: translateY(-1px) scale(1.06);
+}
+/* primary (Text Roger): deep navy glass with an inner shine */
+.dock__btn--primary {
+  color: #fff;
+  background:
+    radial-gradient(120% 70% at 30% 0%, rgb(255 255 255 / .32), transparent 55%),
+    linear-gradient(165deg, rgb(52 82 150 / .95), rgb(22 40 86 / .96));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .45),
+    inset 0 0 0 .5px rgb(255 255 255 / .25),
+    inset 0 -6px 12px -8px rgb(0 0 0 / .35),
+    0 12px 24px -12px rgb(28 52 102 / .75);
+}
+.dock__btn--primary:hover, .dock__btn--primary:focus-visible {
+  color: #fff;
+  background:
+    radial-gradient(120% 70% at 30% 0%, rgb(255 255 255 / .4), transparent 55%),
+    linear-gradient(165deg, rgb(60 92 165 / .98), rgb(24 44 94 / .98));
+}
+.dock__btn--primary::after { box-shadow: 0 0 0 2px rgb(30 52 105); }
+.dock__tip { background: rgb(255 255 255 / .72); -webkit-backdrop-filter: blur(16px) saturate(180%); backdrop-filter: blur(16px) saturate(180%); }
+

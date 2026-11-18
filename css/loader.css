@@ -8,9 +8,7 @@
 .loader {
   position: fixed; inset: 0; z-index: 2147483600;
   display: none; place-items: center;
-  background:
-    radial-gradient(60% 45% at 50% 55%, #fff, transparent 70%),
-    linear-gradient(180deg, #f8f9fc 0%, #eef1f6 60%, #e4e9f1 100%);
+  background: #ffffff;
   clip-path: inset(0 0 0 0);
 }
 html.is-loading .loader, .loader.is-leaving { display: grid; }

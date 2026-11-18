@@ -421,7 +421,8 @@
       return h;
     }
     measure() {
-      const phone = innerWidth <= 749;
+      // "compact" layout below 1100px: the spec card stacks under the showroom (phones + tablets)
+      const phone = innerWidth <= 1099;
       this.phone = phone;
       this.mode = phone ? (this.dataset.mstyle || 'ring') : (this.dataset.style || 'ring');
 
@@ -431,7 +432,9 @@
       } else {
         this.style.removeProperty('--rw-frame-h');
         const Wp = this.stage.clientWidth || innerWidth;
-        const carH = Math.round(Wp * 0.8 / this.maxAr);
+        // big car, but never taller than ~45% of the screen (landscape tablets)
+        // landscape tablets have little height: keep the whole car above the fold
+        const carH = Math.round(Math.min(Wp * 0.8 / this.maxAr, innerHeight * (innerWidth > innerHeight ? 0.3 : 0.45)));
         this.stage.style.height = Math.round(carH + 166 + this.captionHeight()) + 'px';
       }
       this.placePanel(phone);
@@ -449,17 +452,31 @@
       }
       this.FW = FW;
       if (ring) {
-        // one car in focus, centred on the full stage width; it is sized so it never
-        // runs under the floating card (FW = where the card starts)
-        hx = 0.5 * W;
-        const clear = phone ? W * 0.84 : Math.min(W * 0.62, 2 * (FW - hx - 24));
-        const capRoom = this.captionHeight() + (phone ? 44 : 80);   // caption + gaps above the car
+        // One big car in focus. Target width: most of the free area (left of the card).
+        // It stays centred on the page when it fits; otherwise it moves left into the
+        // free space rather than shrinking. It never runs under the card.
+        const EDGE = phone ? 16 : 24;
+        const short = !phone && innerHeight < 820;               // short laptop screens: tighter vertical rhythm
+        this.short = short;
+        const capRoom = this.captionHeight() + (phone ? 44 : short ? 50 : 80);   // caption + gaps above the car
+        const want = phone ? W * 0.86 : Math.min(FW * 0.8, W * 0.62);
+        const fit = Math.max(W * 0.3, FW - EDGE * 2);
         modelH = Math.max(110, Math.round(Math.min(
           (H * (phone ? 0.62 : 0.66)) / fs,
-          Math.max(W * 0.3, clear) / (this.maxAr * fs),
+          Math.min(want, fit) / (this.maxAr * fs),
           (H - capRoom - (phone ? 44 : 34)) / fs)));
+        const vis = modelH * this.maxAr * fs;                 // on-screen width of the active car
+        hx = clamp(Math.min(0.5 * W, FW - EDGE - vis / 2), EDGE + vis / 2, W - EDGE - vis / 2);
         hy = phone ? 44 : Math.round(clamp(34 + (H - modelH * fs - capRoom - 34) * 0.45, 34, 200));
         this.unit = Math.max(120, 0.45 * W);
+        // neighbours: centred on the screen edges (half visible, blurred), shrunk if needed
+        // so they keep a clear gap from the active car
+        const GAP = phone ? 14 : 28, baseW = modelH * this.maxAr;
+        const sideFor = (room) => clamp((2 * (room - GAP)) / baseW, 0.34, 0.6);
+        this.sideL = sideFor(hx - vis / 2);                  // room between the left edge and the car
+        this.sideR = sideFor(W - (hx + vis / 2));             // room between the car and the right edge
+        // caption may only be as wide as the free space around the car
+        this.style.setProperty('--rw-cap-max', Math.round(2 * Math.max(120, Math.min(hx, FW - hx) - EDGE)) + 'px');
       } else {
         modelH = Math.max(90, Math.round(W * 0.8 / this.maxAr));
         hy = 40; hx = 0.44 * W;
@@ -467,7 +484,7 @@
       }
       this.modelH = modelH; this.hx = hx; this.hy = hy;
       // caption sits just above the car's roof, centred over the active car
-      this.stage.style.setProperty('--rw-cap-bottom', Math.round(hy + modelH * fs + (phone ? 28 : 48)) + 'px');
+      this.stage.style.setProperty('--rw-cap-bottom', Math.round(hy + modelH * fs + (phone ? 28 : this.short ? 26 : 48)) + 'px');
       this.capShift = phone ? Math.min(140, W * 0.32) : Math.min(280, W * 0.2);
       this.stage.style.setProperty('--rw-model-h', modelH + 'px');
       this.stage.style.setProperty('--rw-hx', hx + 'px');
@@ -520,13 +537,13 @@
           <linearGradient id="rwFloorFade" gradientUnits="userSpaceOnUse" x1="0" y1="${f(yh)}" x2="0" y2="${f(H)}">
             <stop offset="0" stop-color="#1c3466" stop-opacity="0"/>
             <stop offset="${((yh + span * 0.15 - yh) / (H - yh)).toFixed(3)}" stop-color="#1c3466" stop-opacity="0"/>
-            <stop offset="${((fadeTop - yh) / (H - yh)).toFixed(3)}" stop-color="#1c3466" stop-opacity=".05"/>
-            <stop offset="${((floorY - yh) / (H - yh)).toFixed(3)}" stop-color="#1c3466" stop-opacity=".11"/>
-            <stop offset="1" stop-color="#1c3466" stop-opacity=".13"/>
+            <stop offset="${((fadeTop - yh) / (H - yh)).toFixed(3)}" stop-color="#1c3466" stop-opacity=".015"/>
+            <stop offset="${((floorY - yh) / (H - yh)).toFixed(3)}" stop-color="#1c3466" stop-opacity=".036"/>
+            <stop offset="1" stop-color="#1c3466" stop-opacity=".042"/>
           </linearGradient>
-          <radialGradient id="rwFloorEdge" gradientUnits="userSpaceOnUse" cx="${f(hx)}" cy="${f(floorY)}" r="${f(Math.max(W * 0.62, span * 2))}">
+          <radialGradient id="rwFloorEdge" gradientUnits="userSpaceOnUse" cx="${f(hx)}" cy="${f(floorY)}" r="${f(Math.max(modelH * this.maxAr * fs * 0.85, span * 1.6))}">  <!-- only a soft pool of floor around the active car -->
             <stop offset="0" stop-color="#fff"/>
-            <stop offset=".6" stop-color="#fff"/>
+            <stop offset=".35" stop-color="#fff"/>
             <stop offset="1" stop-color="#000"/>
           </radialGradient>
           <mask id="rwFloorMask" maskUnits="userSpaceOnUse" x="0" y="0" width="${f(W)}" height="${f(H)}">
@@ -627,17 +644,15 @@
       if (this.mode === 'ring') {
         // Focus layout: slot 0 = centre, slot ±1 = centred on the stage edge
         // (half the car visible, smaller, blurred), slot ±2 and beyond = hidden.
-        const SIDE = 0.6;                         // neighbour scale
         const BLUR = this.phone ? 5 : 8;          // neighbour blur (px)
         for (const b of this.bodies) {
           const s = this.wrap(b.a - this.cur);
           const t = Math.abs(s), sg = Math.sign(s);
+          const SIDE = sg < 0 ? (this.sideL || 0.6) : (this.sideR || 0.6);   // neighbour scale (per side)
           const p = Math.pow(SIDE, Math.min(t, 1)) * Math.pow(0.85, Math.max(0, t - 1));
           const scale = p * (1 + (fs - 1) * clamp(1 - t, 0, 1));
-          // neighbour sits a clear gap away from the active car's edge
-          const baseW = modelH * this.maxAr;
-          const GAP = this.phone ? 18 : Math.max(48, W * 0.05);
-          const step1 = baseW * fs / 2 + GAP + baseW * SIDE / 2;   // centre-to-centre at slot ±1
+          // slot ±1 is centred on the screen edge, so only half the neighbour shows
+          const step1 = sg < 0 ? hx : W - hx;
           const x = hx + sg * (t <= 1 ? step1 * t : step1 + W * 0.35 * (t - 1));
           const bottom = hy + modelH * 0.16 * (1 - Math.pow(SIDE, Math.min(t, 1)));
           const blur = t <= 1 ? BLUR * t : BLUR + 3 * (t - 1);
